@@ -9,16 +9,22 @@ connectDB();
 const app = express();
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',')
-  : [
-      'http://localhost:5173',
-      'https://blood-sync-nine.vercel.app',
-      'https://bloodsync.vercel.app',
-      'https://bloodsync-arnab-kashyap.vercel.app',
-    ];
+  ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim())
+  : [];
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, postman)
+    if (!origin) return callback(null, true);
+    if (
+      origin.includes('localhost') ||
+      origin.endsWith('.vercel.app') ||
+      allowedOrigins.includes(origin)
+    ) {
+      return callback(null, true);
+    }
+    return callback(null, true);
+  },
   credentials: true,
 }));
 app.use(express.json());
