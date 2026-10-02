@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 
 dotenv.config();
+
 connectDB().then(async () => {
   try {
     const { seedDonorsInternal } = require('./scripts/seedDonorsInternal');
@@ -19,21 +20,30 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim())
   : [];
 
-app.use(cors({
+const corsOptions = {
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps, curl, postman)
     if (!origin) return callback(null, true);
     if (
       origin.includes('localhost') ||
+      origin.includes('127.0.0.1') ||
       origin.endsWith('.vercel.app') ||
-      allowedOrigins.includes(origin)
+      allowedOrigins.includes(origin) ||
+      allowedOrigins.some(o => o && origin.startsWith(o))
     ) {
       return callback(null, true);
     }
     return callback(null, true);
   },
   credentials: true,
-}));
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -49,6 +59,14 @@ app.get('/', (req, res) => {
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
+});
+
+// Global Error Handler to guarantee CORS headers on uncaught errors
+app.use((err, req, res, next) => {
+  console.error('Unhandled Server Error:', err);
+  res.status(err.status || 500).json({
+    message: err.message || 'Internal Server Error',
+  });
 });
 
 const PORT = process.env.PORT || 5000;
