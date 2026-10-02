@@ -1,0 +1,24 @@
+{
+  "modelName": "BloodSync Donor Recommender v1.0",
+  "algorithm": "Weighted Logistic Feature Ranker",
+  "version": "1.0.0",
+  "trainedAt": "2026-10-02T05:05:20.418Z",
+  "featureNames": [
+    "exactBloodMatch",
+    "distanceScore",
+    "responseRate",
+    "donationExperience",
+    "recencyScore",
+    "profileCompleteness"
+  ],
+  "weights": {
+    "exactBloodMatch": 0.35,
+    "distanceScore": 0.25,
+    "responseRate": 0.15,
+    "donationExperience": 0.1,
+    "recencyScore": 0.1,
+    "profileCompleteness": 0.05
+  },
+  "bias": 0,
+  "recommendationThreshold": 0.7
+}
