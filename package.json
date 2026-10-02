@@ -2,9 +2,11 @@
   "name": "bloodsync-root",
   "version": "1.0.0",
   "private": true,
+  "workspaces": [
+    "client"
+  ],
   "scripts": {
-    "build": "cd client && npm install && npm run build",
-    "start": "cd server && node index.js"
+    "build": "npm run build --workspace=client"
   },
   "dependencies": {
     "axios": "^1.15.0",
