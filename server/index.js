@@ -16,11 +16,15 @@ connectDB().then(async () => {
 
 const app = express();
 
-// Explicit CORS Middleware guaranteeing Access-Control-Allow-Origin on all responses and preflights
+// Explicit CORS Middleware guaranteeing valid Access-Control-Allow-Origin on all responses and preflights
 app.use((req, res, next) => {
-  const origin = req.headers.origin || '*';
-  res.setHeader('Access-Control-Allow-Origin', origin);
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  const origin = req.get('Origin');
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
 
@@ -29,6 +33,7 @@ app.use((req, res, next) => {
   }
   next();
 });
+
 
 
 app.use(express.json());
@@ -51,13 +56,18 @@ app.use((req, res) => {
 // Global Error Handler to guarantee CORS headers on uncaught errors
 app.use((err, req, res, next) => {
   console.error('Unhandled Server Error:', err);
-  const origin = req.headers.origin || '*';
-  res.setHeader('Access-Control-Allow-Origin', origin);
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  const origin = req.get('Origin');
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
   res.status(err.status || 500).json({
     message: err.message || 'Internal Server Error',
   });
 });
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
