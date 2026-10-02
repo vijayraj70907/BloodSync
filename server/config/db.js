@@ -14,8 +14,7 @@ const connectDB = async () => {
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error(`❌ MongoDB Error: ${error.message}`);
-    console.error(`💡 Tip: Please update MONGO_URI in server/.env with a valid connection string (e.g., mongodb://127.0.0.1:27017/bloodsync or MongoDB Atlas mongodb+srv://...)`);
-    process.exit(1);
+    console.error(`💡 Tip: Check MONGO_URI and ensure 0.0.0.0/0 is added in MongoDB Atlas Network Access.`);
   }
 };
 
