@@ -16,16 +16,20 @@ connectDB().then(async () => {
 
 const app = express();
 
-// Enable CORS for all origins & preflights
-app.use(cors({
-  origin: true,
-  credentials: true,
-}));
+// Explicit CORS Middleware guaranteeing Access-Control-Allow-Origin on all responses and preflights
+app.use((req, res, next) => {
+  const origin = req.headers.origin || '*';
+  res.setHeader('Access-Control-Allow-Origin', origin);
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
 
-app.options('*', cors({
-  origin: true,
-  credentials: true,
-}));
+  if (req.method === 'OPTIONS') {
+    return res.status(200).send('OK');
+  }
+  next();
+});
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
