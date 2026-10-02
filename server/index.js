@@ -4,7 +4,19 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 
 dotenv.config();
-connectDB();
+connectDB().then(async () => {
+  try {
+    const User = require('./models/User');
+    const userCount = await User.countDocuments();
+    if (userCount === 0) {
+      console.log('🌱 Database is empty. Seeding initial donor data...');
+      const { seedDonorsInternal } = require('./scripts/seedDonorsInternal');
+      await seedDonorsInternal();
+    }
+  } catch (err) {
+    console.error('Auto-seed check warning:', err.message);
+  }
+});
 
 const app = express();
 
